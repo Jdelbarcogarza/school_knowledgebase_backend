@@ -1,13 +1,14 @@
 from dotenv import load_dotenv
 from langchain_pinecone import PineconeVectorStore
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI, AzureOpenAIEmbeddings, AzureChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain.prompts import ChatPromptTemplate
 load_dotenv()
 
 index_name = "school-kb"
 prompt = "How can i write a single 'helloWorld' GET endpoint in express.js?"
-embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
+embeddings = AzureOpenAIEmbeddings(model="OpenAIEmbeddings")
+# embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
 
 vectorstore = PineconeVectorStore(index_name=index_name, embedding=embeddings)
 
@@ -26,9 +27,11 @@ prompt_template = ChatPromptTemplate.from_messages([
   ("human", "{prompt}")
 ])
 
-model = ChatOpenAI()
+model = AzureChatOpenAI(azure_deployment="Innovation-gpt4o", api_version="2024-02-01")
+# model = ChatOpenAI()
+
 parser = StrOutputParser()
-chain = prompt_template | model | parser
+chain = prompt_template | model | parser 
 
 response = chain.invoke({
   "context": context,
